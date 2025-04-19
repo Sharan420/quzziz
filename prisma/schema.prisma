@@ -13,3 +13,19 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+model Quizes {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  imageUrl String
+  title String
+  description String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  questions Question[]
+}
+
+type Question {
+  question String
+  options String[]
+  correctOption Int
+}
