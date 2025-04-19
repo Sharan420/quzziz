@@ -4,11 +4,12 @@ import prisma from "@/lib/prisma";
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
+    console.log("searchParams", searchParams);
     const id = searchParams.get("id");
     const sanitized = searchParams.get("sanitized") ?? "true";
 
     const shouldSanitize = sanitized === "true";
-
+    console.log("shouldSanitize", shouldSanitize);
     if (!id) {
       return NextResponse.json(
         { error: "Quiz ID is required" },

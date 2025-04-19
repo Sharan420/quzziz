@@ -8,6 +8,16 @@ import {
   RadialBarChart,
 } from "recharts";
 import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -35,20 +45,31 @@ const Results = () => {
   const [quiz, setQuiz] = useState<any>(null);
   useEffect(() => {
     const fetchResult = async () => {
-      const result = await fetch(`/api/getQuizResults?resId=${resId}`);
+      const apiUrl = `/api/getQuizResults?sanitized=false&resId=${resId}`;
+      console.log("apiUrl", apiUrl);
+      const result = await fetch(apiUrl);
       const resultData = await result.json();
       console.log(resultData);
-      setResult(resultData);
       if (resultData) {
-        const quiz = await fetch(`/api/getQuizByID?id=${id}`);
+        const quiz = await fetch(`/api/getQuizByID?id=${id}&sanitized=false`);
         const quizData = await quiz.json();
         console.log(quizData);
         setQuiz(quizData);
+        setResult(resultData);
       }
     };
     fetchResult();
   }, [resId, id]);
   if (result) {
+    const attempt = result.attempt;
+    const tableData = quiz?.questions.map((question: any, index: number) => {
+      return {
+        question: question.question,
+        correct: question.options[question.correctOption],
+        attempt: question.options[attempt[index]],
+      };
+    });
+    console.log("test", quiz?.questions);
     const chartData = [
       {
         type: "Correct",
@@ -57,11 +78,29 @@ const Results = () => {
       },
     ];
     return (
-      <div className='flex flex-col items-center justify-center'>
+      <div className='min-h-[calc(100vh-9rem)] h-full flex flex-col items-center justify-center'>
         <div className='flex flex-row justify-between gap-10 w-[85%]'>
-          <div className='flex flex-col gap-2'>
+          <div className='flex flex-col gap-2 justify-between'>
             <h1 className='text-6xl font-bold'>{quiz?.title}</h1>
             <p className='text-2xl text-gray-500'>{quiz?.description}</p>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className='w-1/3'>Question</TableHead>
+                  <TableHead className='w-1/3'>Correct Answer</TableHead>
+                  <TableHead className='w-1/3'>Your Answer</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {tableData.map((row: any) => (
+                  <TableRow key={row.question}>
+                    <TableCell>{row.question}</TableCell>
+                    <TableCell>{row.correct}</TableCell>
+                    <TableCell>{row.attempt}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
           <Card className='flex flex-col'>
             <CardHeader className='items-center pb-0'>
@@ -113,7 +152,9 @@ const Results = () => {
                                 y={viewBox.cy}
                                 className='fill-foreground text-4xl font-bold'
                               >
-                                {chartData[0].score.toLocaleString()}
+                                {chartData[0].score.toLocaleString() +
+                                  "/" +
+                                  quiz?.questions.length.toLocaleString()}
                               </tspan>
                               <tspan
                                 x={viewBox.cx}
