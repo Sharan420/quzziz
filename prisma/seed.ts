@@ -7,7 +7,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "JavaScript Basics",
     description: "Test your knowledge of JavaScript fundamentals",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/js/400/250",
     questions: [
       {
         question: "What is JavaScript?",
@@ -39,7 +39,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "Python Programming",
     description: "Test your Python programming skills",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/python/400/250",
     questions: [
       {
         question: "What is Python?",
@@ -71,7 +71,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "Web Development",
     description: "Test your knowledge of web development concepts",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/web/400/250",
     questions: [
       {
         question: "What does HTML stand for?",
@@ -108,7 +108,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "React.js Fundamentals",
     description: "Test your knowledge of React.js",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/react/400/250",
     questions: [
       {
         question: "What is React.js?",
@@ -145,7 +145,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "Node.js Basics",
     description: "Test your knowledge of Node.js",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/node/400/250",
     questions: [
       {
         question: "What is Node.js?",
@@ -182,7 +182,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "Database Concepts",
     description: "Test your knowledge of database systems",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/db/400/250",
     questions: [
       {
         question: "What is SQL?",
@@ -219,7 +219,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "Git and Version Control",
     description: "Test your knowledge of Git and version control",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/git/400/250",
     questions: [
       {
         question: "What is Git?",
@@ -256,7 +256,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "RESTful APIs",
     description: "Test your knowledge of RESTful API concepts",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/api/400/250",
     questions: [
       {
         question: "What does REST stand for?",
@@ -293,7 +293,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "TypeScript Basics",
     description: "Test your knowledge of TypeScript",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/ts/400/250",
     questions: [
       {
         question: "What is TypeScript?",
@@ -330,7 +330,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "Docker Basics",
     description: "Test your knowledge of Docker",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/docker/400/250",
     questions: [
       {
         question: "What is Docker?",
@@ -367,7 +367,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "AWS Cloud Services",
     description: "Test your knowledge of AWS services",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/aws/400/250",
     questions: [
       {
         question: "What is AWS?",
@@ -404,7 +404,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "Machine Learning Basics",
     description: "Test your knowledge of machine learning concepts",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/ml/400/250",
     questions: [
       {
         question: "What is machine learning?",
@@ -441,7 +441,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "Cybersecurity Basics",
     description: "Test your knowledge of cybersecurity",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/security/400/250",
     questions: [
       {
         question: "What is encryption?",
@@ -478,7 +478,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "Agile Methodology",
     description: "Test your knowledge of Agile development",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/agile/400/250",
     questions: [
       {
         question: "What is Agile?",
@@ -515,7 +515,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "Data Structures",
     description: "Test your knowledge of data structures",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/ds/400/250",
     questions: [
       {
         question: "What is a data structure?",
@@ -552,7 +552,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "Algorithms",
     description: "Test your knowledge of algorithms",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/algo/400/250",
     questions: [
       {
         question: "What is an algorithm?",
@@ -589,7 +589,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "DevOps Practices",
     description: "Test your knowledge of DevOps",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/devops/400/250",
     questions: [
       {
         question: "What is DevOps?",
@@ -626,7 +626,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "Mobile Development",
     description: "Test your knowledge of mobile development",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/mobile/400/250",
     questions: [
       {
         question: "What is React Native?",
@@ -663,7 +663,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "UI/UX Design",
     description: "Test your knowledge of UI/UX design",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/design/400/250",
     questions: [
       {
         question: "What is UI design?",
@@ -700,7 +700,7 @@ const quizzes: Prisma.QuizesCreateInput[] = [
   {
     title: "Testing and QA",
     description: "Test your knowledge of software testing",
-    imageUrl: "https://picsum.photos/400/250",
+    imageUrl: "https://picsum.photos/seed/qa/400/250",
     questions: [
       {
         question: "What is unit testing?",

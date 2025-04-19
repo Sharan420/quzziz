@@ -3,11 +3,13 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { type Quiz } from "@/app/api/getQuizes/route";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 
 const Quiz = () => {
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState<number>(0);
   const [attempt, setAttempt] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const params = useParams();
   console.log(params);
@@ -53,36 +55,49 @@ const Quiz = () => {
 
   useEffect(() => {
     const fetchQuiz = async () => {
+      setIsLoading(true);
       const res = await fetch(`/api/getQuizByID?id=${params.id}`);
       const data = await res.json();
       setQuiz(data);
       console.log(data);
+      setIsLoading(false);
     };
     fetchQuiz();
   }, [params.id]);
 
   return (
     <div className='w-full h-full min-h-[calc(100vh-9rem)] flex flex-col items-center justify-between'>
-      <h1 className='text-4xl font-bold'>{quiz?.title}</h1>
-      <h2 className='text-2xl font-bold'>
-        {currentQuestion + 1 + ". " + quiz?.questions[currentQuestion].question}
-      </h2>
-      <div className='w-full h-full flex flex-row items-center justify-center gap-10'>
-        {quiz?.questions[currentQuestion].options.map((option, index) => (
-          <Card
-            className={`w-full h-fit min-h-50 cursor-pointer ${
-              getRandomColor()[index]
-            }`}
-            key={index}
-            onClick={async () => await handleOptionClick(option, index)}
-          >
-            <CardHeader className='text-center text-2xl font-bold'>
-              <CardTitle>Option {index + 1}</CardTitle>
-            </CardHeader>
-            <CardContent className='text-center text-2xl'>{option}</CardContent>
-          </Card>
-        ))}
-      </div>
+      {isLoading ? (
+        <Loader2 className='w-10 h-10 animate-spin' />
+      ) : (
+        <>
+          <h1 className='text-4xl font-bold'>{quiz?.title}</h1>
+          <h2 className='text-2xl font-bold'>
+            {currentQuestion +
+              1 +
+              ". " +
+              quiz?.questions[currentQuestion].question}
+          </h2>
+          <div className='w-full h-full flex flex-row items-center justify-center gap-10'>
+            {quiz?.questions[currentQuestion].options.map((option, index) => (
+              <Card
+                className={`w-full h-fit min-h-50 cursor-pointer ${
+                  getRandomColor()[index]
+                }`}
+                key={index}
+                onClick={async () => await handleOptionClick(option, index)}
+              >
+                <CardHeader className='text-center text-2xl font-bold'>
+                  <CardTitle>Option {index + 1}</CardTitle>
+                </CardHeader>
+                <CardContent className='text-center text-2xl'>
+                  {option}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };
