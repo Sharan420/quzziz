@@ -23,9 +23,16 @@ model Quizes {
   updatedAt DateTime @updatedAt
   questions Question[]
 }
-
 type Question {
   question String
   options String[]
   correctOption Int
+}
+
+model Results {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  quizId String @db.ObjectId
+  score Int
+  attempt Int[]
+  createdAt DateTime @default(now())
 }

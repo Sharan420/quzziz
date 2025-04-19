@@ -1,5 +1,5 @@
 "use client";
-import Navbar from "@/components/navbar";
+
 import QuizCard from "@/components/quiz_card";
 import { useEffect, useState } from "react";
 import {
@@ -34,8 +34,7 @@ const Home = () => {
   }, [page]);
 
   return (
-    <div className='flex flex-col items-start justify-start min-h-screen bg-background pt-28 pb-8 px-8 gap-10'>
-      <Navbar />
+    <div className='w-full h-full min-h-[calc(100vh-9rem)] flex flex-col bg-background gap-10'>
       <div className='flex flex-row flex-wrap items-center justify-center gap-8'>
         {quizes.map((quiz) => (
           <QuizCard
@@ -52,21 +51,27 @@ const Home = () => {
           <PaginationItem>
             <PaginationPrevious
               onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              className={page === 1 ? "pointer-events-none opacity-50" : ""}
+              className={
+                page === 1
+                  ? "cursor-not-allowed pointer-events-none opacity-50"
+                  : "cursor-pointer"
+              }
               isActive={page !== 1}
             />
           </PaginationItem>
           <PaginationItem
             className={
               page === totalPages && page !== 1
-                ? ""
+                ? "cursor-pointer"
                 : "pointer-events-none hidden"
             }
           >
             <PaginationEllipsis />
           </PaginationItem>
           <PaginationItem
-            className={page === 1 ? "pointer-events-none hidden" : ""}
+            className={
+              page === 1 ? "pointer-events-none hidden" : "cursor-pointer"
+            }
           >
             <PaginationLink
               onClick={() => setPage((prev) => Math.max(1, prev - 1))}
@@ -80,7 +85,9 @@ const Home = () => {
           <div className='items-center md:flex hidden'>
             <PaginationItem
               className={
-                page === totalPages ? "pointer-events-none hidden" : ""
+                page === totalPages
+                  ? "pointer-events-none hidden"
+                  : "cursor-pointer"
               }
               onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
             >
@@ -88,7 +95,9 @@ const Home = () => {
             </PaginationItem>
             <PaginationItem
               className={
-                page === totalPages ? "pointer-events-none hidden" : ""
+                page === totalPages
+                  ? "pointer-events-none hidden"
+                  : "cursor-pointer"
               }
             >
               <PaginationEllipsis />
@@ -98,7 +107,9 @@ const Home = () => {
             <PaginationNext
               onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
               className={
-                page === totalPages ? "pointer-events-none opacity-50" : ""
+                page === totalPages
+                  ? "pointer-events-none opacity-50"
+                  : "cursor-pointer"
               }
               isActive={page !== totalPages}
             />

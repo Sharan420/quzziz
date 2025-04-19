@@ -1,14 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-const GET = async (req: NextRequest) => {
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("id");
-  const quiz = await prisma.quizes.findUnique({
-    where: { id: id as string },
-  });
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const id = searchParams.get("id");
+    const sanitized = searchParams.get("sanitized") ?? "true";
 
-  if (quiz) {
+    const shouldSanitize = sanitized === "true";
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Quiz ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const quiz = await prisma.quizes.findUnique({
+      where: { id: id },
+    });
+
+    if (!shouldSanitize) {
+      return NextResponse.json(quiz);
+    }
+
+    if (!quiz) {
+      return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
+    }
+
     // Remove correctOption from each question
     const sanitizedQuiz = {
       ...quiz,
@@ -17,10 +36,13 @@ const GET = async (req: NextRequest) => {
         options,
       })),
     };
+
     return NextResponse.json(sanitizedQuiz);
+  } catch (error) {
+    console.error("Error fetching quiz:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json({ error: "Quiz not found" }, { status: 404 });
-};
-
-export { GET };
+}
