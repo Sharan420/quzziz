@@ -8,6 +8,7 @@ interface QuizCardProps {
   quizId: string;
   title: string;
   loading?: boolean;
+  description: string;
 }
 
 const QuizCard = ({
@@ -15,6 +16,7 @@ const QuizCard = ({
   quizId,
   title,
   loading = false,
+  description,
 }: QuizCardProps) => {
   return (
     <div className='relative rounded-base flex flex-col shadow-shadow border-2 gap-6 py-0 border-border bg-background text-foreground font-base'>
@@ -23,7 +25,9 @@ const QuizCard = ({
           <Loader2 className='w-12 h-12 animate-spin' />
         </div>
       ) : (
-        <Image src={imageUrl} alt={title} width={400} height={250} />
+        <div className='w-[400px] h-[250px] relative'>
+          <Image src={imageUrl} alt={title} fill className='object-cover' />
+        </div>
       )}
       {loading ? (
         <div className='absolute bottom-0 flex flex-col items-center gap-2 bg-background/90 w-full p-4'>
@@ -38,6 +42,7 @@ const QuizCard = ({
       ) : (
         <div className='absolute bottom-0 flex flex-col items-center gap-2 bg-background/90 w-full p-4'>
           <h1 className='text-2xl font-bold'>{title}</h1>
+          <p className='text-sm text-muted-foreground'>{description}</p>
           <Link href={`/quiz/${quizId}`} className='w-full'>
             <Button className='w-full cursor-pointer'>Click me</Button>
           </Link>

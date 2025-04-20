@@ -124,7 +124,7 @@ const CreateQuizPage = () => {
   return (
     <Card className='w-full max-w-2xl mx-auto mt-10'>
       <CardHeader>
-        <CardTitle>Create Quiz</CardTitle>
+        <CardTitle className='text-2xl font-bold'>Create Quiz</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>

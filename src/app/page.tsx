@@ -1,7 +1,7 @@
 "use client";
 
 import QuizCard from "@/components/quiz_card";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -12,37 +12,35 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Quiz } from "./api/getQuizes/route";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 
 const Home = () => {
-  const [quizes, setQuizes] = useState<Quiz[]>([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(0);
 
-  useEffect(() => {
-    const fetchQuizes = async () => {
-      setLoading(true);
-      const apiUrl = `/api/getQuizes?page=${page}&limit=9`;
-      console.log(apiUrl);
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-      setQuizes(data.quizes);
-      setTotalPages(data.totalPages);
-      setLoading(false);
-    };
-    fetchQuizes();
-  }, [page]);
+  const { data: quizes, isPending } = useQuery({
+    queryKey: ["quizes", page],
+    queryFn: () => fetchQuizes(page),
+  });
+
+  if (isPending) {
+    return (
+      <div className='w-full flex items-center justify-center h-full'>
+        <Loader2 className='w-10 h-10 animate-spin' />
+      </div>
+    );
+  }
 
   return (
     <div className='w-full h-full min-h-[calc(100vh-9rem)] flex flex-col bg-background gap-10'>
       <div className='flex flex-row flex-wrap items-center justify-center gap-8'>
-        {quizes.map((quiz) => (
+        {quizes?.quizes.map((quiz: Quiz) => (
           <QuizCard
             key={quiz.id}
             imageUrl={quiz.imageUrl}
             quizId={quiz.id}
             title={quiz.title}
-            loading={loading}
+            description={quiz.description}
           />
         ))}
       </div>
@@ -61,7 +59,7 @@ const Home = () => {
           </PaginationItem>
           <PaginationItem
             className={
-              page === totalPages && page !== 1
+              page === quizes?.totalPages && page !== 1
                 ? "cursor-pointer"
                 : "pointer-events-none hidden"
             }
@@ -85,17 +83,19 @@ const Home = () => {
           <div className='items-center md:flex hidden'>
             <PaginationItem
               className={
-                page === totalPages
+                page === quizes?.totalPages
                   ? "pointer-events-none hidden"
                   : "cursor-pointer"
               }
-              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+              onClick={() =>
+                setPage((prev) => Math.min(quizes?.totalPages, prev + 1))
+              }
             >
               <PaginationLink href='#'>{page + 1}</PaginationLink>
             </PaginationItem>
             <PaginationItem
               className={
-                page === totalPages
+                page === quizes?.totalPages
                   ? "pointer-events-none hidden"
                   : "cursor-pointer"
               }
@@ -105,19 +105,29 @@ const Home = () => {
           </div>
           <PaginationItem>
             <PaginationNext
-              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+              onClick={() =>
+                setPage((prev) => Math.min(quizes?.totalPages, prev + 1))
+              }
               className={
-                page === totalPages
+                page === quizes?.totalPages
                   ? "pointer-events-none opacity-50"
                   : "cursor-pointer"
               }
-              isActive={page !== totalPages}
+              isActive={page !== quizes?.totalPages}
             />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
     </div>
   );
+};
+
+const fetchQuizes = async (page: number) => {
+  const apiUrl = `/api/getQuizes?page=${page}&limit=9`;
+  console.log(apiUrl);
+  const response = await fetch(apiUrl);
+  const data = await response.json();
+  return data;
 };
 
 export default Home;
