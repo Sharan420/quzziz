@@ -79,7 +79,7 @@ const Results = () => {
   ];
 
   return (
-    <div className='min-h-[calc(100vh-9rem)] h-full flex flex-col items-center justify-center'>
+    <div className='min-h-[calc(100vh-9rem)] h-full flex flex-col items-center justify-center w-full'>
       {isPending ? (
         <Loader2 className='w-10 h-10 animate-spin' />
       ) : (

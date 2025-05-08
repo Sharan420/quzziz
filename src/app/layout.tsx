@@ -36,7 +36,7 @@ export default function RootLayout({
       >
         <Providers>
           <Navbar />
-          <main className='min-h-screen h-full bg-background pt-28 pb-8 px-8'>
+          <main className='flex flex-grow min-h-screen bg-background pt-28 pb-8 px-8'>
             {children}
           </main>
           <Toaster closeButton />

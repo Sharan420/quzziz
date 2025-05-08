@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { Plus, Trash2 } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +18,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
+import { Loader2 } from "lucide-react";
 
 const questionSchema = z.object({
   question: z.string().min(1, "Question is required"),
@@ -43,6 +47,15 @@ const quizSchema = z.object({
     .max(20, "Maximum 20 questions allowed"),
 });
 
+const geminiQuizSchema = z.object({
+  title: z.string().min(1, "Title is required").max(100, "Title is too long"),
+  description: z
+    .string()
+    .min(1, "Description is required")
+    .max(500, "Description is too long"),
+  imageUrl: z.string().url("Invalid image URL").optional(),
+});
+
 const CreateQuizPage = () => {
   const form = useForm<z.infer<typeof quizSchema>>({
     resolver: zodResolver(quizSchema),
@@ -65,6 +78,32 @@ const CreateQuizPage = () => {
     name: "questions",
   });
 
+  const geminiForm = useForm<z.infer<typeof geminiQuizSchema>>({
+    resolver: zodResolver(geminiQuizSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      imageUrl: "",
+    },
+  });
+
+  const createGeminiQuiz = useMutation({
+    mutationFn: async (values: z.infer<typeof geminiQuizSchema>) => {
+      const imageUrl =
+        values.imageUrl?.trim() || "https://picsum.photos/300/200";
+      const response = await fetch("/api/createQuiz/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...values, imageUrl }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create quiz with AI");
+      }
+      return data;
+    },
+  });
+
   async function onSubmit(values: z.infer<typeof quizSchema>) {
     const { title, description, imageUrl, questions } = values;
     const response = await fetch("/api/createQuiz", {
@@ -77,6 +116,14 @@ const CreateQuizPage = () => {
       toast.success("Quiz created successfully");
     } else {
       toast.error("Failed to create quiz");
+    }
+  }
+  async function onGeminiSubmit(values: z.infer<typeof geminiQuizSchema>) {
+    try {
+      await createGeminiQuiz.mutateAsync(values);
+      toast.success("Quiz created successfully with AI");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to create quiz with AI");
     }
   }
 
@@ -122,196 +169,258 @@ const CreateQuizPage = () => {
   };
 
   return (
-    <Card className='w-full max-w-2xl mx-auto mt-10'>
-      <CardHeader>
-        <CardTitle className='text-2xl font-bold'>Create Quiz</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
-            <FormField
-              control={form.control}
-              name='title'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Quiz Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Enter quiz title' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <div className='w-full flex justify-center gap-10 items-start'>
+      <Card className='w-full min-w-182 max-w-2xl mx-auto h-fit'>
+        <CardHeader>
+          <CardTitle className='text-2xl font-bold'>Create Quiz</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+              <FormField
+                control={form.control}
+                name='title'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Quiz Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Enter Quiz Title' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='description'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Enter quiz description' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='description'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Enter quiz description' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='imageUrl'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Image URL (Optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='https://example.com/image.jpg'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    A URL for the quiz cover image
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='imageUrl'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Image URL (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='https://example.com/image.jpg'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      A URL for the quiz cover image
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className='space-y-4'>
-              <div className='flex items-center justify-between'>
-                <h3 className='text-lg font-medium'>Questions</h3>
-                <Button
-                  type='button'
-                  size='sm'
-                  onClick={addQuestion}
-                  disabled={fields.length >= 20}
-                >
-                  <Plus className='h-4 w-4 mr-2' />
-                  Add Question
-                </Button>
-              </div>
+              <div className='space-y-4'>
+                <div className='flex items-center justify-between'>
+                  <h3 className='text-lg font-medium'>Questions</h3>
+                  <Button
+                    type='button'
+                    size='sm'
+                    onClick={addQuestion}
+                    disabled={fields.length >= 20}
+                  >
+                    <Plus className='h-4 w-4 mr-2' />
+                    Add Question
+                  </Button>
+                </div>
 
-              {fields.map((field, index) => (
-                <div key={field.id} className='border p-4 rounded-lg space-y-4'>
-                  <div className='flex items-center justify-between'>
-                    <h4 className='font-medium'>Question {index + 1}</h4>
-                    {fields.length > 1 && (
-                      <Button
-                        type='button'
-                        variant={null}
-                        size='sm'
-                        onClick={() => remove(index)}
-                      >
-                        <Trash2 className='h-4 w-4 text-destructive' />
-                      </Button>
-                    )}
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name={`questions.${index}.question`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Question Text</FormLabel>
-                        <FormControl>
-                          <Input placeholder='Enter question' {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className='space-y-2'>
+                {fields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className='border p-4 rounded-lg space-y-4'
+                  >
                     <div className='flex items-center justify-between'>
-                      <FormLabel>Options</FormLabel>
-                      <Button
-                        type='button'
-                        variant='default'
-                        size='sm'
-                        onClick={() => addOption(index)}
-                        disabled={
-                          form.watch(`questions.${index}.options`).length >= 4
-                        }
-                      >
-                        <Plus className='h-4 w-4 mr-2' />
-                        Add Option
-                      </Button>
+                      <h4 className='font-medium'>Question {index + 1}</h4>
+                      {fields.length > 1 && (
+                        <Button
+                          type='button'
+                          variant={null}
+                          size='sm'
+                          onClick={() => remove(index)}
+                        >
+                          <Trash2 className='h-4 w-4 text-destructive' />
+                        </Button>
+                      )}
                     </div>
 
-                    {form
-                      .watch(`questions.${index}.options`)
-                      .map((_, optionIndex) => (
-                        <div
-                          key={optionIndex}
-                          className='flex items-center gap-2'
+                    <FormField
+                      control={form.control}
+                      name={`questions.${index}.question`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Question Text</FormLabel>
+                          <FormControl>
+                            <Input placeholder='Enter question' {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className='space-y-2'>
+                      <div className='flex items-center justify-between'>
+                        <FormLabel>Options</FormLabel>
+                        <Button
+                          type='button'
+                          variant='default'
+                          size='sm'
+                          onClick={() => addOption(index)}
+                          disabled={
+                            form.watch(`questions.${index}.options`).length >= 4
+                          }
                         >
-                          <FormField
-                            control={form.control}
-                            name={`questions.${index}.options.${optionIndex}`}
-                            render={({ field }) => (
-                              <FormItem className='flex-1'>
-                                <FormControl>
-                                  <Input
-                                    placeholder={`Option ${optionIndex + 1}`}
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
+                          <Plus className='h-4 w-4 mr-2' />
+                          Add Option
+                        </Button>
+                      </div>
+
+                      {form
+                        .watch(`questions.${index}.options`)
+                        .map((_, optionIndex) => (
+                          <div
+                            key={optionIndex}
+                            className='flex items-center gap-2'
+                          >
+                            <FormField
+                              control={form.control}
+                              name={`questions.${index}.options.${optionIndex}`}
+                              render={({ field }) => (
+                                <FormItem className='flex-1'>
+                                  <FormControl>
+                                    <Input
+                                      placeholder={`Option ${optionIndex + 1}`}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            {form.watch(`questions.${index}.options`).length >
+                              2 && (
+                              <Button
+                                type='button'
+                                variant='default'
+                                size='sm'
+                                onClick={() => removeOption(index, optionIndex)}
+                              >
+                                <Trash2 className='h-4 w-4' />
+                              </Button>
                             )}
-                          />
-                          {form.watch(`questions.${index}.options`).length >
-                            2 && (
-                            <Button
-                              type='button'
-                              variant='default'
-                              size='sm'
-                              onClick={() => removeOption(index, optionIndex)}
-                            >
-                              <Trash2 className='h-4 w-4' />
-                            </Button>
-                          )}
-                        </div>
-                      ))}
+                          </div>
+                        ))}
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name={`questions.${index}.correctOption`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Correct Option</FormLabel>
+                          <FormControl>
+                            <Input
+                              type='number'
+                              min='0'
+                              max={
+                                form.watch(`questions.${index}.options`)
+                                  .length - 1
+                              }
+                              {...field}
+                              onChange={(e) =>
+                                field.onChange(parseInt(e.target.value))
+                              }
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Enter the index of the correct option (0-
+                            {form.watch(`questions.${index}.options`).length -
+                              1}
+                            )
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
+                ))}
+              </div>
 
-                  <FormField
-                    control={form.control}
-                    name={`questions.${index}.correctOption`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Correct Option</FormLabel>
-                        <FormControl>
-                          <Input
-                            type='number'
-                            min='0'
-                            max={
-                              form.watch(`questions.${index}.options`).length -
-                              1
-                            }
-                            {...field}
-                            onChange={(e) =>
-                              field.onChange(parseInt(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Enter the index of the correct option (0-
-                          {form.watch(`questions.${index}.options`).length - 1})
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+              <Button type='submit'>Create Quiz</Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+      <Separator orientation='vertical' className='h-auto' />
+      <Card className='w-full max-w-2xl mx-auto h-fit'>
+        <CardHeader>
+          <CardTitle className='text-2xl font-bold'>
+            Use Gemini To Create Quiz
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...geminiForm}>
+            <form
+              onSubmit={geminiForm.handleSubmit(onGeminiSubmit)}
+              className='space-y-4'
+            >
+              <FormLabel>Title</FormLabel>
+              <FormField
+                control={geminiForm.control}
+                name='title'
+                render={({ field }) => (
+                  <Input placeholder='Enter Quiz Title' {...field} />
+                )}
+              />
+              <FormLabel>Description</FormLabel>
+              <FormField
+                control={geminiForm.control}
+                name='description'
+                render={({ field }) => (
+                  <Textarea
+                    placeholder='Enter a prompt describing the quiz you want to create...'
+                    className='min-h-[100px]'
+                    {...field}
                   />
-                </div>
-              ))}
-            </div>
-
-            <Button type='submit'>Create Quiz</Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+                )}
+              />
+              <FormLabel>Image URL (Optional)</FormLabel>
+              <FormField
+                control={geminiForm.control}
+                name='imageUrl'
+                render={({ field }) => (
+                  <Input
+                    placeholder='https://example.com/image.jpg'
+                    {...field}
+                  />
+                )}
+              />
+              <Button type='submit' disabled={createGeminiQuiz.isPending}>
+                {createGeminiQuiz.isPending ? (
+                  <Loader2 className='animate-spin w-4 h-4' />
+                ) : (
+                  "Create Quiz"
+                )}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
